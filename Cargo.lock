@@ -89,6 +89,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a4385e2e34eb35d6b3efe798b9eb88096925d87726c0798709bf56d9ed84af3"
 
 [[package]]
+name = "app_schema"
+version = "0.0.1"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "arcstr"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -307,6 +314,25 @@ dependencies = [
  "tokio",
  "tower",
  "url",
+]
+
+[[package]]
+name = "backend"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "app_schema",
+ "axum",
+ "axum-test",
+ "dotenvy",
+ "prometheus",
+ "redis",
+ "reqwest 0.13.4",
+ "serde",
+ "sqlx 0.8.6",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

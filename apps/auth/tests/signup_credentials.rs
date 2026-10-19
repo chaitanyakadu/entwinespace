@@ -8,7 +8,10 @@ use auth::schema::{
 };
 use sqlx::PgPool;
 
-use crate::common::{axum::create_server, database::create_new_user};
+use crate::common::{
+    axum::create_server, 
+    database::create_new_user
+};
 
 #[path = "./common/mod.rs"]
 mod common;

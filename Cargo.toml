@@ -3,5 +3,7 @@
 
 members = [
   "apps/auth",
-  "packages/db"
+  "apps/backend",
+  "packages/db",
+  "packages/schema"
 ]

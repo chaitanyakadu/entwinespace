@@ -13,3 +13,7 @@ dotenvy = "0.15.7"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 anyhow = "1.0.102"
+axum-test = "20.1.0"
+app_schema = { path = "../../packages/schema" }
+reqwest = { version = "0.13.3", features = ["json", "multipart", "form"] }
+serde = { version = "1.0", features = ["derive"] }

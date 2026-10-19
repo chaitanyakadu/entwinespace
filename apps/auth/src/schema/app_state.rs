@@ -37,7 +37,6 @@ impl Metadata {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Security {
-    pub argon_hash_secret: String,
     pub symmetric_enc_secret: String,
     pub jwt_secret: String,
 }
@@ -45,7 +44,6 @@ pub struct Security {
 impl Security {
     pub fn from_env() -> Result<Self, VarError> {
         Ok(Self {
-            argon_hash_secret: std::env::var("ARGON_HASH_SECRET")?,
             symmetric_enc_secret: std::env::var("SYMMETRIC_ENC_SECRET")?,
             jwt_secret: std::env::var("JWT_SECRET")?,
         })

@@ -66,22 +66,3 @@ CREATE TABLE refresh_token
 );
 
 
--- CREATE PROFILE TABLE
-/* 
-CREATE TABLE profile 
-(
-  user_id UUID NOT NULL REFERENCES users (id),
-  -- space_id UUID NOT NULL REFERENCES space(id),
-  display_name VARCHAR(16) NOT NULL,
-  bio TEXT,
-  -- character ENUM(),
-  public_key TEXT NOT NULL,
-  -- status ENUM(),
-  -- audio_status ENUM(),
-  -- video_status ENUM(),
-
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-*/
-
