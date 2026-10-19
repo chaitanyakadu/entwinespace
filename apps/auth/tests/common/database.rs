@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
+use app_schema::config::AppConfig;
 use auth::schema::{
-    app_state::Config,
     routes::SignupCredentials,
     tests::{NewUserEntry, RefreshToken, Users},
 };
@@ -10,7 +10,7 @@ use time::{Duration, OffsetDateTime};
 use auth::utils::security::{generate_sha2_hash, sym_encryption};
 use uuid::Uuid;
 
-pub async fn create_new_user(db: Arc<PgPool>, config: Config) -> NewUserEntry {
+pub async fn create_new_user(db: Arc<PgPool>, config: AppConfig) -> NewUserEntry {
     let mut tx = db.begin().await.unwrap();
 
     let payload = SignupCredentials {
@@ -26,9 +26,9 @@ pub async fn create_new_user(db: Arc<PgPool>, config: Config) -> NewUserEntry {
     let hashed_contact = generate_sha2_hash(&payload.contact);
 
     let email_encrypted =
-        sym_encryption(&payload.email, &config.security.symmetric_enc_secret).unwrap();
+        sym_encryption(&payload.email, &config.auth_service.access_token_jwt_secret).unwrap();
     let contact_encrypted =
-        sym_encryption(&payload.contact, &config.security.symmetric_enc_secret).unwrap();
+        sym_encryption(&payload.contact, &config.auth_service.access_token_jwt_secret).unwrap();
 
     let user = sqlx::query_as!(
         Users,

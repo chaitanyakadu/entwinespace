@@ -12,8 +12,8 @@ pub fn get_cors(app_state: Arc<AppState>) -> CorsLayer {
         .allow_origin(
             app_state
                 .config
-                .metadata
-                .frontend_url
+                .frontend_service
+                .url
                 .parse::<HeaderValue>()
                 .unwrap(),
         )

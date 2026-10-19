@@ -37,7 +37,7 @@ pub async fn ensure_authenticated(
         .get("access_token")
         .ok_or_else(|| unauthenticated_and_return())?
         .value();
-    let access_token_state = verify_access_token(&access_token, &config.security.jwt_secret);
+    let access_token_state = verify_access_token(&access_token, &config.auth_service.access_token_jwt_secret);
     if matches!(access_token_state, AccessTokenState::Valid) {
         return Ok(next.run(req).await);
     };

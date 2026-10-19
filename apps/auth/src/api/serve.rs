@@ -20,14 +20,14 @@ pub async fn serve(app_state: Arc<AppState>) -> anyhow::Result<()> {
 
     let listener = tokio::net::TcpListener::bind(format!(
         "{}:{}",
-        &config.metadata.hostname, &config.metadata.port
+        &config.auth_service.hostname, &config.auth_service.port
     ))
     .await
     .inspect_err(|e| error!(error = ?e))?;
 
     info!(
         "The authentication server is listening on {}:{}",
-        &config.metadata.hostname, &config.metadata.port
+        &config.auth_service.hostname, &config.auth_service.port
     );
 
     UPTIME.inc();

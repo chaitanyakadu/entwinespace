@@ -9,14 +9,14 @@ use axum::{
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use jsonwebtoken::Header;
 use reqwest::{StatusCode, header};
-use crate::schema::{
+use crate::{api::database::auth::add_profile_and_settings, schema::{
     app_state::AppState,
     routes::{
         ApiResponse, ApiResponseCodeAuth, ApiResponseIssue, AuthProvider, OauthIdentity,
         RefreshToken, SignupCredentials, UserData, Userinfo,
     },
     security::{AccessClaims, JWTClaims},
-};
+}};
 use sqlx::Error as SqlxError;
 use time::{Duration, OffsetDateTime};
 use tracing::{debug, warn};
@@ -68,7 +68,7 @@ pub async fn post_signup_credentials(
 
     // encrypt specific credentials
     debug!("encrypt credentials");
-    let email_encrypted = sym_encryption(&payload.email, &config.security.symmetric_enc_secret)
+    let email_encrypted = sym_encryption(&payload.email, &config.auth_service.enc_secret)
         .map_err(|e| {
             warn!(
                 error = ?e,
@@ -76,7 +76,7 @@ pub async fn post_signup_credentials(
             );
             server_error_response_api()
         })?;
-    let contact_encrypted = sym_encryption(&payload.contact, &config.security.symmetric_enc_secret)
+    let contact_encrypted = sym_encryption(&payload.contact, &config.auth_service.enc_secret)
         .map_err(|e| {
             warn!(
                 error = ?e,
@@ -191,6 +191,10 @@ pub async fn post_signup_credentials(
             _ => server_error_response_api(),
         })?;
 
+    add_profile_and_settings(&user_id, &mut tx)
+        .await
+        .unwrap();
+
     tx.commit().await.map_err(|e| {
         warn!(error = ?e, "failed to commit the transaction");
         server_error_response_api()
@@ -209,7 +213,7 @@ pub async fn post_signup_credentials(
     };
     let jwt_claims = JWTClaims::AccessToken(access_claims);
     let access_token =
-        generate_jwt(jwt_claims, &config.security.jwt_secret, header).map_err(|e| {
+        generate_jwt(jwt_claims, &config.auth_service.access_token_jwt_secret, header).map_err(|e| {
             debug!(
                 error = ?e,
                 "failed to generate jsonwebtoken"

@@ -59,8 +59,8 @@ pub async fn get_signup_callback(
 
     let oauth_tokens: GoogleOauthToken = exchange_auth_code(
         &code,
-        &config.third_party.google_redirect_uri,
-        &config.third_party,
+        &config.google_oauth.redirect_uri,
+        &config.google_oauth,
     )
     .await?;
 
@@ -126,6 +126,6 @@ pub async fn get_signup_callback(
     Ok(frontend_redirect(
         "/auth/signup/credentials/",
         query,
-        &config.metadata.frontend_url,
+        &config.frontend_service.url,
     )?)
 }

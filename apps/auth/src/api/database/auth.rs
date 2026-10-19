@@ -221,3 +221,58 @@ pub async fn email_exists(email_hash: &str, db: &PgPool) -> Result<bool, Error> 
         Ok(_) => Ok(true),
     }
 }
+
+/// While signup add profile and settings
+pub async fn add_profile_and_settings(
+    user_id: &Uuid,
+    tx: &mut Transaction<'_, Postgres>,
+) -> Result<(), Error> {
+    debug!(
+        user_id = ?user_id,
+        "add a new profile and settings entry while signup"
+    );
+    sqlx::query!(
+        r#"
+    INSERT INTO profile (
+        user_id,
+        status,
+        avatar,
+        banner
+    )
+    VALUES ($1, $2, $3, $4)
+    "#,
+        user_id,
+        "available",
+        "https://i.postimg.cc/yNhtbN13/user.png",
+        "https://i.postimg.cc/zfw6cfzL/banner-header-paper-crumpled.jpg",
+    )
+    .execute(&mut **tx)
+    .await
+    .map_err(|e| {
+        warn!(error = ?e, "failed to insert new profile");
+        e
+    })?;
+
+    sqlx::query!(
+        r#"
+    INSERT INTO settings (
+        user_id,
+        notifications,
+        nearby_audio,
+        keybindings
+    )
+    VALUES ($1, $2, $3, $4)
+    "#,
+        user_id,
+        2,
+        false,
+        "1:a,2:b,c:a,d:c",
+    )
+    .execute(&mut **tx)
+    .await
+    .map_err(|e| {
+        warn!(error = ?e, "failed to insert new profile");
+        e
+    })?;
+    Ok(())
+}

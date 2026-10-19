@@ -14,7 +14,7 @@ pub async fn get_oauth_redirect_uri(
 ) -> Result<Response, Response> {
     let config = &state.config;
 
-    let redirect_uri = oauth_redirect_uri(&config.third_party, &params.redirect_url)
+    let redirect_uri = oauth_redirect_uri(&config.google_oauth, &params.redirect_url)
         .map_err(|e| e.into_response())?;
 
     let response = Redirect::to(redirect_uri.as_str()).into_response();

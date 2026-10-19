@@ -122,7 +122,7 @@ pub async fn revoke_session_restricted(
         })?;
 
     if user_id == params.token_id {
-        let redirect_uri = format!("{}/login", &config.metadata.frontend_url);
+        let redirect_uri = format!("{}/login", &config.frontend_service.url);
         let mut response = Redirect::to(&redirect_uri).into_response();
         response.headers_mut().remove("Cookie");
         return Ok(response);

@@ -24,7 +24,7 @@ pub async fn ensure_turnstile_verification(
     let client = reqwest::Client::new();
     let res = client.post("https://challenges.cloudflare.com/turnstile/v0/siteverify")
         .json(&json!({
-            "secret": config.third_party.turnstile_key,
+            "secret": config.cloudflare.turnstile_secret_key,
             "response": params.token
         }))
         .send()

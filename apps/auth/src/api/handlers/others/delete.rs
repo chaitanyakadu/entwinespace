@@ -50,7 +50,7 @@ pub async fn delete_account(
     };
 
     let username =
-        decode_jwt_for_username(&access_token, &config.security.jwt_secret).map_err(|_| {
+        decode_jwt_for_username(&access_token, &config.auth_service.access_token_jwt_secret).map_err(|_| {
             let response_code = ApiResponseCode::Failure;
             let response_payload = ApiResponsePayload {
                 msg: "Invalid credentials! Kindly check the access token.".to_string(),

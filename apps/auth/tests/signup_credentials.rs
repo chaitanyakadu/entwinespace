@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
+use app_schema::config::AppConfig;
 use redis::{AsyncTypedCommands, aio::MultiplexedConnection};
 use reqwest::StatusCode;
 use auth::schema::{
-    app_state::{AppState, Config},
+    app_state::AppState,
     routes::{SignupCredentials, Userinfo},
 };
 use sqlx::PgPool;
@@ -23,13 +24,14 @@ mod common;
 // // signup using valid credentials
 // test 3 - valid credentials
 async fn signup_credentials(pool: PgPool) {
-    let config = Config::from_env();
+    let config = AppConfig::from_env()
+        .unwrap();
     let server = create_server(config.clone(), pool.clone()).await;
 
     let db = Arc::new(pool.clone());
     let new_user_entry = create_new_user(Arc::clone(&db), config.clone()).await;
 
-    let redis_url = config.clone().metadata.redis_url;
+    let redis_url = config.clone().redis.url;
     let redis_client = redis::Client::open(redis_url).unwrap();
     let redis_client = Arc::new(redis_client);
 

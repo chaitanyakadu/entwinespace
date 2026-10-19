@@ -3,17 +3,18 @@ mod common;
 
 use std::sync::Arc;
 
+use app_schema::config::AppConfig;
 use common::axum::create_server;
 use common::database::create_new_user;
 
 use reqwest::StatusCode;
-use auth::schema::app_state::Config;
 use auth::utils::security::generate_sha2_hash;
 use sqlx::PgPool;
 
 #[sqlx::test(migrations = "../../packages/db/migrations")]
 async fn logout(pool: PgPool) {
-    let config = Config::from_env();
+    let config = AppConfig::from_env()
+        .unwrap();
     let server = create_server(config.clone(), pool.clone()).await;
 
     let db = Arc::new(pool);

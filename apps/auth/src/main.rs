@@ -1,9 +1,10 @@
 mod schema;
 use std::sync::Arc;
 
+use app_schema::config::AppConfig;
 use auth::api::serve::serve;
 use dotenvy::dotenv;
-use auth::schema::app_state::{AppState, Config};
+use auth::schema::app_state::AppState;
 use sqlx::PgPool;
 use tracing::{debug, error, info};
 use tracing_subscriber::EnvFilter;
@@ -20,15 +21,16 @@ async fn main() -> anyhow::Result<()> {
     // initial setup
     // postgres pool, redis client and configs
     info!("Starting application");
-    let config = Config::from_env();
+    let config = AppConfig::from_env()
+        .unwrap();
 
     debug!("Connecting to PostgreSQL");
-    let pool = PgPool::connect(&config.metadata.postgres_url)
+    let pool = PgPool::connect(&config.database.url)
         .await
         .inspect_err(|e| error!(error = ?e, "Failed to connect postgres database"))?;
 
     debug!("Creating Redis Client");
-    let redis_client = redis::Client::open(&*config.metadata.redis_url)?;
+    let redis_client = redis::Client::open(&*config.redis.url)?;
     let redis_client = Arc::new(redis_client);
 
     debug!("Building the AppState");

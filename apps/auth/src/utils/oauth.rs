@@ -1,7 +1,7 @@
+use app_schema::config::GoogleOAuthConfig;
 use axum::response::Response;
 use reqwest::{StatusCode, Url};
 use crate::schema::{
-    app_state::ThirdPartyConfig,
     routes::{GoogleOauthToken, RefreshOauthTokenResponse, Userinfo},
 };
 use serde_json::json;
@@ -10,11 +10,11 @@ use tracing::{debug, warn};
 use crate::utils::routes::server_error_response_api;
 
 /// Generate oauth redirect uri
-pub fn oauth_redirect_uri(config: &ThirdPartyConfig, redirect_uri: &str) -> Result<Url, Response> {
+pub fn oauth_redirect_uri(config: &GoogleOAuthConfig, redirect_uri: &str) -> Result<Url, Response> {
     debug!("generating oauth redirect uri");
     let url = "https://accounts.google.com/o/oauth2/v2/auth";
     let params = [
-        ("client_id", config.google_client_id.clone()),
+        ("client_id", config.client_id.clone()),
         ("response_type", "code".to_string()),
         ("scope", "openid profile email".to_string()),
         ("redirect_uri", redirect_uri.to_string()),
@@ -41,7 +41,7 @@ pub fn oauth_redirect_uri(config: &ThirdPartyConfig, redirect_uri: &str) -> Resu
 pub async fn exchange_auth_code(
     code: &str,
     redirect_uri: &str,
-    config: &ThirdPartyConfig,
+    config: &GoogleOAuthConfig,
 ) -> Result<GoogleOauthToken, Response> {
     debug!("exchange authorization code for refresh and access tokens");
     let client = reqwest::Client::new();
@@ -49,8 +49,8 @@ pub async fn exchange_auth_code(
         .post("https://oauth2.googleapis.com/token")
         .form::<Vec<(&str, String)>>(&vec![
             ("code", code.to_string()),
-            ("client_id", config.google_client_id.clone()),
-            ("client_secret", config.google_client_secret.clone()),
+            ("client_id", config.client_id.clone()),
+            ("client_secret", config.client_secret.clone()),
             ("redirect_uri", redirect_uri.to_string()),
             ("grant_type", "authorization_code".to_string()),
         ])
@@ -151,15 +151,15 @@ pub async fn call_google_apis(
 /// Refresh an access token
 pub async fn refresh_token(
     refresh_token: &str,
-    config: &ThirdPartyConfig,
+    config: &GoogleOAuthConfig,
 ) -> Result<RefreshOauthTokenResponse, Response> {
     debug!("refresh the oauth access token");
     let client = reqwest::Client::new();
     let res = client
         .post("https://oauth2.googleapis.com/token")
         .form::<Vec<(&str, String)>>(&vec![
-            ("client_id", config.google_client_id.clone()),
-            ("client_secret", config.google_client_secret.clone()),
+            ("client_id", config.client_id.clone()),
+            ("client_secret", config.client_secret.clone()),
             ("refresh_token", refresh_token.to_string()),
             ("grant_type", "refresh_token".to_string()),
         ])

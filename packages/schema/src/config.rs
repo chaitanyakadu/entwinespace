@@ -70,6 +70,7 @@ pub struct BackendService {
     pub hostname: String,
     pub port: u16,
     pub version: String,
+    pub url: String
 }
 
 impl BackendService {
@@ -78,6 +79,7 @@ impl BackendService {
             hostname: env::var("BACKEND_SERVICE_HOSTNAME")?,
             port: env::var("BACKEND_SERVICE_PORT")?.parse()?,
             version: env::var("BACKEND_SERVICE_VERSION")?,
+            url: env::var("BACKEND_SERVICE_URL")?,
         })
     }
 }
@@ -91,6 +93,7 @@ pub struct AuthService {
     pub hostname: String,
     pub port: u16,
     pub version: String,
+    pub url: String,
 
     pub access_token_jwt_secret: String,
     pub enc_secret: String,
@@ -102,6 +105,7 @@ impl AuthService {
             hostname: env::var("AUTH_SERVICE_HOSTNAME")?,
             port: env::var("AUTH_SERVICE_PORT")?.parse()?,
             version: env::var("AUTH_SERVICE_VERSION")?,
+            url: env::var("AUTH_SERVICE_URL")?,
 
             access_token_jwt_secret:
                 env::var("AUTH_SERVICE_ACCESS_TOKEN_JWT_SECRET")?,
@@ -121,6 +125,7 @@ pub struct FrontendService {
     pub hostname: String,
     pub port: u16,
     pub version: String,
+    pub url: String,
 }
 
 impl FrontendService {
@@ -129,6 +134,7 @@ impl FrontendService {
             hostname: env::var("FRONTEND_SERVICE_HOSTNAME")?,
             port: env::var("FRONTEND_SERVICE_PORT")?.parse()?,
             version: env::var("FRONTEND_SERVICE_VERSION")?,
+            url: env::var("FRONTEND_SERVICE_URL")?,
         })
     }
 }

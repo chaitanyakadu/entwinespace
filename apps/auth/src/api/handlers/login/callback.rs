@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use app_schema::config::AppConfig;
 use axum::{
     Json,
     extract::{Query, State},
@@ -11,7 +12,7 @@ use jsonwebtoken::Header;
 use redis::{AsyncTypedCommands, aio::MultiplexedConnection};
 use reqwest::{StatusCode, Url, header};
 use crate::schema::{
-    app_state::{AppState, Config},
+    app_state::AppState,
     routes::{
         ApiResponse, ApiResponseCodeAuth, ApiResponseIssue, GetSignupCallbackParams,
         GoogleOauthToken, RefreshToken, Userinfo,
@@ -68,11 +69,11 @@ pub async fn get_login_callback(
     };
 
     let redirect_uri = config
-        .third_party
-        .google_redirect_uri
+        .google_oauth
+        .redirect_uri
         .replace("signup", "login");
     let oauth_tokens: GoogleOauthToken =
-        exchange_auth_code(&code, &redirect_uri, &config.third_party).await?;
+        exchange_auth_code(&code, &redirect_uri, &config.google_oauth).await?;
 
     let userinfo: Userinfo = call_google_apis(&oauth_tokens).await?;
 
@@ -205,7 +206,7 @@ pub async fn get_login_callback(
     };
     let jwt_claims = JWTClaims::AccessToken(access_claims);
     let access_token =
-        generate_jwt(jwt_claims, &config.security.jwt_secret, header).map_err(|e| {
+        generate_jwt(jwt_claims, &config.auth_service.access_token_jwt_secret, header).map_err(|e| {
             debug!(
                 error = ?e,
                 "failed to generate jsonwebtoken"
@@ -255,7 +256,7 @@ pub async fn get_login_callback(
 }
 
 async fn handle_access_sessions(
-    config: &Config,
+    config: &AppConfig,
     active_sessions: Vec<String>,
     state: &AppState,
     user_id: Uuid,
@@ -282,7 +283,7 @@ async fn handle_access_sessions(
         ("error", "too many active sessions".to_string()),
         ("token", session_token.to_string()),
     ];
-    let mut url = Url::parse_with_params(&config.metadata.frontend_url, &query).map_err(|e| {
+    let mut url = Url::parse_with_params(&config.frontend_service.url, &query).map_err(|e| {
         debug!(
             endpoint = ?endpoint,
             query = ?query,

@@ -38,7 +38,7 @@ pub async fn ensure_guest(
 
     if let Some(token) = access_token {
         let access_token_state =
-            verify_access_token(&token.to_string(), &config.security.jwt_secret);
+            verify_access_token(&token.to_string(), &config.auth_service.access_token_jwt_secret);
         if let AccessTokenState::Valid = access_token_state {
             return Ok(authenticated_and_return());
         };
